@@ -1,72 +1,52 @@
-VERSION := "$(shell git describe --tags)-$(shell git rev-parse --short HEAD)"
-BUILDTIME := $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
+include ./common.mk
 
-GOLDFLAGS += -X github.com/openconfig/gnmi-gateway/gateway.Version=$(VERSION)
-GOLDFLAGS += -X github.com/openconfig/gnmi-gateway/gateway.Buildtime=$(BUILDTIME)
-GOFLAGS = -ldflags "$(GOLDFLAGS)"
+# VERSION := "$(shell git describe --tags)-$(shell git rev-parse --short HEAD)"
+# BUILDTIME := $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 
-.PHONY: build release
+# GOLDFLAGS += -X github.com/openconfig/gnmi-gateway/gateway.Version=$(VERSION)
+# GOLDFLAGS += -X github.com/openconfig/gnmi-gateway/gateway.Buildtime=$(BUILDTIME)
+# GOFLAGS = -ldflags "$(GOLDFLAGS)"
 
-build: clean
-	go build -o gnmi-gateway $(GOFLAGS) .
-	./gnmi-gateway -version
+##
+# Add in project specific targets below
+##
 
-clean:
-	rm -f gnmi-gateway
-	rm -f cover.out
+# Tools
 
-cover:
-	go test -count=1 -cover -coverprofile=cover.out ./...
-	go tool cover -func=cover.out
+.PHONY: coverage
+coverage: overalls | $(GOVERALLS) ; $(info $(M) running coveralls) @ ## run coveralls (PROJECT)
+	$Q $(GOVERALLS) -coverprofile=overalls.coverprofile -service=travis-ci
 
-debug: build
-	./gnmi-gateway -PProf -CPUProfile=cpu.pprof -EnableGNMIServer -ServerTLSCert=server.crt -ServerTLSKey=server.key -TargetLoaders=json -TargetJSONFile=targets.json
 
-download:
-	if [ -d ./oc-models ]; then git --git-dir=./oc-models/.git pull; else git clone https://github.com/openconfig/public.git oc-models; fi
+# this and the common clean will both executed because of ::
 
-godoc:
-	godoc -http=":6060"
+.PHONY: clean
+clean:: ; $(info $(M) gnmi-gateway clean) @ ## clean (ADDITIONAL)
+	@rm -rf  build/_output
 
-imports:
-	goimports -local github.com/openconfig/gnmi-gateway -w -l $(shell find . -type f -name '*.go' -not -path './vendor/*' -not -path '*.pb.go')
 
-integration:
-	echo "Integration Test Note: Make sure you have Zookeeper running on 127.0.0.1:2181 (see README)."
-	go test -tags=integration -count=1 -cover ./...
+# example of override the build target in the common makefile, you'll get a make warning about overriding
+# but the return code will be ok
 
-lint: imports
-	go fmt ./ ./gateway/...
-	go vet
+# .PHONY: build
+# build: $(BIN) ; $(info $(M) building executable…) @ ## Build program binary (OVERRIDE)
+# 	go build -o gnmi-gateway $(GOFLAGS) .
+# 	./gnmi-gateway -version
+# buildExecutabel:
+# 	go build -o gnmi-gateway $(GOFLAGS) .
+# 	./gnmi-gateway -version
 
-release:
-	mkdir -p release
-	rm -f release/gnmi-gateway release/gnmi-gateway.exe
-ifeq ($(shell go env GOOS), windows)
-	go build -o release/gnmi-gateway.exe $(GOFLAGS) .
-	cd release; zip -m "gnmi-gateway-$(shell git describe --tags --abbrev=0)-$(shell go env GOOS)-$(shell go env GOARCH).zip" gnmi-gateway.exe
-else
-	go build -o release/gnmi-gateway $(GOFLAGS) .
-	cd release; zip -m "gnmi-gateway-$(shell git describe --tags --abbrev=0)-$(shell go env GOOS)-$(shell go env GOARCH).zip" gnmi-gateway
-endif
-	cd release; sha256sum "gnmi-gateway-$(shell git describe --tags --abbrev=0)-$(shell go env GOOS)-$(shell go env GOARCH).zip" > "gnmi-gateway-$(shell git describe --tags --abbrev=0)-$(shell go env GOOS)-$(shell go env GOARCH).zip.sha256"
+.PHONY: images
+images: docker-$(PRJ_NAME) ; $(info $(M) building images...) @ ## build all docker images (ADDITIONAL)
 
-run: build
-	./gnmi-gateway -EnableGNMIServer -ServerTLSCert=server.crt -ServerTLSKey=server.key -TargetLoaders=json -TargetJSONFile=targets.json
+.PHONY: images-push
+images-push: images $(DOCKER_LOGIN) ; $(info $(M) pushing images...) @ ## push docker images (PROJECT)
+	docker push onosproject/$(PRJ_NAME):$(PRJ_VERSION)
 
-sync:
-	go get ./...
+.PHONY: kind
+kind: images ; $(info $(M) add images to kind cluster...) @ ## add images to kind (ADDITIONAL)
+	@if [ "`kind get clusters`" = '' ]; then echo "no kind cluster found" && exit 1; fi
+	kind load docker-image onosproject/$(PRJ_NAME):$(PRJ_VERSION)
 
-targets:
-	cp targets-example.json targets.json
-
-test: clean
-	go test -count=1 -cover ./...
-
-tls:
-	openssl ecparam -genkey -name secp384r1 -out server.key
-	openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650 -subj "/CN=selfsigned.gnmi-gateway.local"
-
-update:
-	go mod tidy
-	go get -u ./...
+.PHONY: deploy
+deploy: build images images-push kind

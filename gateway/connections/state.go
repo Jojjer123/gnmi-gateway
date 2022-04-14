@@ -33,16 +33,17 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/go-zookeeper/zk"
-	"github.com/openconfig/gnmi/errlist"
 	"sync"
 	"time"
+
+	"github.com/go-zookeeper/zk"
+	"github.com/openconfig/gnmi/client"
+	"github.com/openconfig/gnmi/errlist"
 
 	"github.com/Netflix/spectator-go"
 	"github.com/Netflix/spectator-go/histogram"
 	"github.com/golang/protobuf/proto"
 	"github.com/openconfig/gnmi/cache"
-	"github.com/openconfig/gnmi/client"
 	gnmiclient "github.com/openconfig/gnmi/client/gnmi"
 	gnmipb "github.com/openconfig/gnmi/proto/gnmi"
 	targetpb "github.com/openconfig/gnmi/proto/target"
@@ -204,6 +205,8 @@ func (t *ConnectionState) doConnect() {
 		return
 	}
 
+	query.TLS = nil
+
 	var ctx context.Context
 	ctx, t.clientCancel = context.WithCancel(context.Background())
 	t.config.Log.Info().Msgf("Target %s: Subscribing", t.name)
@@ -363,6 +366,7 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 			if v.Update.Prefix.Target == "" {
 				v.Update.Prefix.Target = t.queryTarget
 			}
+			fmt.Println(v.Update)
 			err := t.updateTargetCache(t.targetCache, v.Update)
 			if err != nil {
 				return err
