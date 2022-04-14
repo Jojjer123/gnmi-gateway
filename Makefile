@@ -11,6 +11,10 @@ include ./common.mk
 # Add in project specific targets below
 ##
 
+tls:
+	openssl ecparam -genkey -name secp384r1 -out server.key
+	openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650 -subj "/CN=selfsigned.gnmi-gateway.local"
+
 # Tools
 
 .PHONY: coverage
