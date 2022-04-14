@@ -34,8 +34,8 @@ clean:: ; $(info $(M) gnmi-gateway clean) @ ## clean (ADDITIONAL)
 
 .PHONY: build
 build: $(BIN) ; $(info $(M) building executable…) @ ## Build program binary (OVERRIDE)
-	go build -o gnmi-gateway $(GOFLAGS) .
-	./gnmi-gateway -version
+	go build -o bin/github.com/openconfig/gnmi-gateway $(GOFLAGS) .
+	./bin/github.com/openconfig/gnmi-gateway -version
 # buildExecutabel:
 # 	go build -o gnmi-gateway $(GOFLAGS) .
 # 	./gnmi-gateway -version
