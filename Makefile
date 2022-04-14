@@ -1,11 +1,11 @@
 include ./common.mk
 
 # VERSION := "$(shell git describe --tags)-$(shell git rev-parse --short HEAD)"
-# BUILDTIME := $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
+BUILDTIME := $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 
-# GOLDFLAGS += -X github.com/openconfig/gnmi-gateway/gateway.Version=$(VERSION)
-# GOLDFLAGS += -X github.com/openconfig/gnmi-gateway/gateway.Buildtime=$(BUILDTIME)
-# GOFLAGS = -ldflags "$(GOLDFLAGS)"
+GOLDFLAGS += -X github.com/openconfig/gnmi-gateway/gateway.Version=$(VERSION)
+GOLDFLAGS += -X github.com/openconfig/gnmi-gateway/gateway.Buildtime=$(BUILDTIME)
+GOFLAGS = -ldflags "$(GOLDFLAGS)"
 
 ##
 # Add in project specific targets below
@@ -32,10 +32,10 @@ clean:: ; $(info $(M) gnmi-gateway clean) @ ## clean (ADDITIONAL)
 # example of override the build target in the common makefile, you'll get a make warning about overriding
 # but the return code will be ok
 
-# .PHONY: build
-# build: $(BIN) ; $(info $(M) building executable…) @ ## Build program binary (OVERRIDE)
-# 	go build -o gnmi-gateway $(GOFLAGS) .
-# 	./gnmi-gateway -version
+.PHONY: build
+build: $(BIN) ; $(info $(M) building executable…) @ ## Build program binary (OVERRIDE)
+	go build -o gnmi-gateway $(GOFLAGS) .
+	./gnmi-gateway -version
 # buildExecutabel:
 # 	go build -o gnmi-gateway $(GOFLAGS) .
 # 	./gnmi-gateway -version
