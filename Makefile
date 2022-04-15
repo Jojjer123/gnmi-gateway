@@ -32,10 +32,10 @@ clean:: ; $(info $(M) gnmi-gateway clean) @ ## clean (ADDITIONAL)
 # example of override the build target in the common makefile, you'll get a make warning about overriding
 # but the return code will be ok
 
-.PHONY: build
-build: $(BIN) ; $(info $(M) building executable…) @ ## Build program binary (OVERRIDE)
-	go build -o gnmi-gateway $(GOFLAGS) .
-	./gnmi-gateway -version
+#.PHONY: build
+#build: $(BIN) ; $(info $(M) building executable…) @ ## Build program binary (OVERRIDE)
+#	go build -o gnmi-gateway $(GOFLAGS) .
+#	./gnmi-gateway -version
 # buildExecutabel:
 # 	go build -o gnmi-gateway $(GOFLAGS) .
 # 	./gnmi-gateway -version
