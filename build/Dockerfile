@@ -20,9 +20,10 @@ CMD ["./testing/gnmi-gateway", \
     "-TargetLoaders=json", \
     "-TargetJSONFile=./targets.json", \
     # "-EnableGNMIServer", \
-    #"-Exporters=kafka", \
-    #"-ExporterKafkaBrokers=192.168.1.164:9092", \
-    #"-ExporterKafkaTopic=counters", \
+    "-ExporterKafkaBatchSize=5", \
+    "-Exporters=kafka", \
+    "-ExporterKafkaBrokers=192.168.1.164:9092", \
+    "-ExporterKafkaTopic=counters", \
     "-OpenConfigDirectory=./oc-models/", \
     "-ServerTLSCert=server.crt", \
     "-ServerTLSKey=server.key"]
