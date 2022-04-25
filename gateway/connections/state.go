@@ -344,6 +344,7 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 				t.counterCoalesced.Add(int64(u.Duplicates))
 			}
 			t.timerLatency.Record(time.Duration(time.Now().UnixNano() - v.Update.Timestamp))
+			t.config.Log.Info().Msg("In t.synced.")
 		}
 
 		switch t.queryTarget {
@@ -357,8 +358,10 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 			t.seenMutex.Unlock()
 			err := t.updateTargetCache(targetCache, v.Update)
 			if err != nil {
+				t.config.Log.Info().Msg("Error from t.updateTargetCache.")
 				return err
 			}
+			t.config.Log.Info().Msg("In *.")
 		default:
 			// Gracefully handle gNMI implementations that do not set Prefix.Target in their
 			// SubscribeResponse Updates.
