@@ -333,6 +333,7 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 	}
 	switch v := resp.Response.(type) {
 	case *gnmipb.SubscribeResponse_Update:
+		t.config.Log.Info().Msg("In case: *gnmipb.SubscribeResponse_Update now.")
 		if t.rejectUpdate(v.Update) {
 			t.config.Log.Info().Msg("Updated was rejected.")
 			t.counterRejected.Increment()
