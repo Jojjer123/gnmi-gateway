@@ -317,7 +317,6 @@ func (t *ConnectionState) unlock() error {
 // cache.Target is called to generate an update. If the message is a sync_response, then targetCache is
 // marked as synchronised.
 func (t *ConnectionState) handleUpdate(msg proto.Message) error {
-	// t.config.Log.Info().Msg("In handleUpdate in state.go now.")
 	//fmt.Printf("%+v\n", msg)
 	t.counterNotifications.Increment()
 	if !t.connected {
@@ -333,9 +332,7 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 	}
 	switch v := resp.Response.(type) {
 	case *gnmipb.SubscribeResponse_Update:
-		// t.config.Log.Info().Msg("In case: *gnmipb.SubscribeResponse_Update now.")
 		if t.rejectUpdate(v.Update) {
-			// t.config.Log.Info().Msg("Updated was rejected.")
 			t.counterRejected.Increment()
 			return nil
 		}
@@ -345,7 +342,6 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 				t.counterCoalesced.Add(int64(u.Duplicates))
 			}
 			t.timerLatency.Record(time.Duration(time.Now().UnixNano() - v.Update.Timestamp))
-			// t.config.Log.Info().Msg("In t.synced.")
 		}
 
 		switch t.queryTarget {
@@ -359,7 +355,6 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 			t.seenMutex.Unlock()
 			err := t.updateTargetCache(targetCache, v.Update)
 			if err != nil {
-				// t.config.Log.Info().Msg("Error from t.updateTargetCache.")
 				return err
 			}
 			t.config.Log.Info().Msg("In *.")
@@ -375,7 +370,6 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 			fmt.Println(v.Update)
 			err := t.updateTargetCache(t.targetCache, v.Update)
 			if err != nil {
-				// t.config.Log.Info().Msg("Error from t.updateTargetCache.")
 				return err
 			}
 		}
