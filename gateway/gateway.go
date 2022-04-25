@@ -326,6 +326,7 @@ func (g *Gateway) StartGateway(opts *StartOpts) error {
 }
 
 func (g *Gateway) sendUpdateToClients(leaf *ctree.Leaf) {
+	g.config.Log.Info().Msg("In sendUpdateToClients now.")
 	for _, client := range g.clients {
 		if client.External {
 			notification := leaf.Value().(*gnmi.Notification)
