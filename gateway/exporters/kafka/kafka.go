@@ -56,6 +56,7 @@ func (e *KafkaExporter) Name() string {
 }
 
 func (e *KafkaExporter) Export(leaf *ctree.Leaf) {
+	e.config.Log.Debug().Msg("In kafka Export function now.")
 	notification := leaf.Value().(*gnmipb.Notification)
 
 	data, err := proto.Marshal(notification)
