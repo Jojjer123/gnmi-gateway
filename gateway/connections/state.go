@@ -375,6 +375,7 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 			fmt.Println(v.Update)
 			err := t.updateTargetCache(t.targetCache, v.Update)
 			if err != nil {
+				t.config.Log.Info().Msg("Error from t.updateTargetCache.")
 				return err
 			}
 		}
