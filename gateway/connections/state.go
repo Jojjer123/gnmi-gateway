@@ -317,7 +317,7 @@ func (t *ConnectionState) unlock() error {
 // cache.Target is called to generate an update. If the message is a sync_response, then targetCache is
 // marked as synchronised.
 func (t *ConnectionState) handleUpdate(msg proto.Message) error {
-	t.config.Log.Info().Msg("In handleUpdate in state.go now.")
+	// t.config.Log.Info().Msg("In handleUpdate in state.go now.")
 	//fmt.Printf("%+v\n", msg)
 	t.counterNotifications.Increment()
 	if !t.connected {
@@ -333,9 +333,9 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 	}
 	switch v := resp.Response.(type) {
 	case *gnmipb.SubscribeResponse_Update:
-		t.config.Log.Info().Msg("In case: *gnmipb.SubscribeResponse_Update now.")
+		// t.config.Log.Info().Msg("In case: *gnmipb.SubscribeResponse_Update now.")
 		if t.rejectUpdate(v.Update) {
-			t.config.Log.Info().Msg("Updated was rejected.")
+			// t.config.Log.Info().Msg("Updated was rejected.")
 			t.counterRejected.Increment()
 			return nil
 		}
@@ -345,7 +345,7 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 				t.counterCoalesced.Add(int64(u.Duplicates))
 			}
 			t.timerLatency.Record(time.Duration(time.Now().UnixNano() - v.Update.Timestamp))
-			t.config.Log.Info().Msg("In t.synced.")
+			// t.config.Log.Info().Msg("In t.synced.")
 		}
 
 		switch t.queryTarget {
@@ -359,7 +359,7 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 			t.seenMutex.Unlock()
 			err := t.updateTargetCache(targetCache, v.Update)
 			if err != nil {
-				t.config.Log.Info().Msg("Error from t.updateTargetCache.")
+				// t.config.Log.Info().Msg("Error from t.updateTargetCache.")
 				return err
 			}
 			t.config.Log.Info().Msg("In *.")
@@ -375,7 +375,7 @@ func (t *ConnectionState) handleUpdate(msg proto.Message) error {
 			fmt.Println(v.Update)
 			err := t.updateTargetCache(t.targetCache, v.Update)
 			if err != nil {
-				t.config.Log.Info().Msg("Error from t.updateTargetCache.")
+				// t.config.Log.Info().Msg("Error from t.updateTargetCache.")
 				return err
 			}
 		}
@@ -416,6 +416,7 @@ func (t *ConnectionState) updateTargetCache(cache *cache.Target, update *gnmipb.
 	var hasError bool
 	err := cache.GnmiUpdate(update)
 	if err != nil {
+		t.config.Log.Info().Msg("Failed to update cache in updateTargetCache in state.go.")
 		// Some errors won't corrupt the cache so no need to return an error to the ProtoHandler caller. For these
 		// errors we just log them and move on.
 		errList, isList := err.(errlist.Error)
