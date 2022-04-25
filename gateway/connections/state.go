@@ -317,6 +317,7 @@ func (t *ConnectionState) unlock() error {
 // cache.Target is called to generate an update. If the message is a sync_response, then targetCache is
 // marked as synchronised.
 func (t *ConnectionState) handleUpdate(msg proto.Message) error {
+	t.config.Log.Info().Msg("In handleUpdate in state.go now.")
 	//fmt.Printf("%+v\n", msg)
 	t.counterNotifications.Increment()
 	if !t.connected {
