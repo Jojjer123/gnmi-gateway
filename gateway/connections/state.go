@@ -416,7 +416,7 @@ func (t *ConnectionState) updateTargetCache(cache *cache.Target, update *gnmipb.
 	var hasError bool
 	err := cache.GnmiUpdate(update)
 	if err != nil {
-		t.config.Log.Info().Msg("Failed to update cache in updateTargetCache in state.go.")
+		t.config.Log.Info().Msgf("Failed to update cache in updateTargetCache in state.go with error %v", err)
 		// Some errors won't corrupt the cache so no need to return an error to the ProtoHandler caller. For these
 		// errors we just log them and move on.
 		errList, isList := err.(errlist.Error)
