@@ -22,8 +22,8 @@ CMD ["./testing/gnmi-gateway", \
     # "-EnableGNMIServer", \
     "-ExporterKafkaBatchSize=5", \
     "-Exporters=kafka", \
-    "-ExporterKafkaBrokers=192.168.1.164:9092", \
-    "-ExporterKafkaTopic=counters", \
+    "-ExporterKafkaBrokers=10.91.216.17:9092", \
+    "-ExporterKafkaTopic=counter_testing", \
     "-OpenConfigDirectory=./oc-models/", \
     "-ServerTLSCert=server.crt", \
     "-ServerTLSKey=server.key"]
