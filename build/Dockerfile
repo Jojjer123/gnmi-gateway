@@ -20,7 +20,7 @@ CMD ["./testing/gnmi-gateway", \
     "-TargetLoaders=json", \
     "-TargetJSONFile=./targets.json", \
     # "-EnableGNMIServer", \
-    "-ExporterKafkaBatchSize=5", \
+    "-ExporterKafkaBatchSize=1", \
     "-Exporters=kafka", \
     "-ExporterKafkaBrokers=10.91.216.17:9092", \
     "-ExporterKafkaTopic=counter_testing", \
