@@ -1,0 +1,49 @@
+{
+	"request": {
+		"default": {
+			"subscribe": {
+			"prefix": {},
+			"subscription": [
+				{
+					"path": {
+						"elem": [
+						{
+							"name": "switch_one"
+						}
+						]
+					}
+				},
+				{
+					"path": {
+						"elem": [
+						{
+							"name": "switch_two"
+						}
+						]
+					}
+				},
+				{
+					"path": {
+						"elem": [
+						{
+							"name": "switch_three"
+						}
+						]
+					}
+				}
+			]
+			}
+		}
+	},
+	"target": {
+		"monitor-service": {
+			"addresses": [
+				"monitor-service:11161"
+			],
+			"request": "default",
+			"meta": {
+				"NoTLSVerify": "yes"
+			}
+		}
+	}
+}
